@@ -128,73 +128,75 @@ jobs:
           UPDATE_COUNT="${{ steps.check_updates.outputs.update_count }}"
           MERGE_STATUS="${{ steps.merge.outputs.merge_status }}"
 
-          # Build PR body
+          # Create PR body file
+          PR_BODY_FILE="/tmp/pr-body-${{github.run_id}}.md"
+
           if [ "$MERGE_STATUS" = "conflicts" ]; then
-            PR_BODY="## ⚠️ Template Updates (Merge Conflicts)
-
-This PR syncs updates from the template repository but has **merge conflicts** that need manual resolution.
-
-### What to do:
-1. Review the conflicts in the Files Changed tab
-2. Resolve conflicts locally or using GitHub's conflict editor
-3. Test the changes
-4. Merge when ready
-
-### Updates
-- Template commits: $UPDATE_COUNT new commits
-- Status: ⚠️ Has conflicts
-
-### Conflict Resolution Help
-\`\`\`bash
-# Check out this branch
-git fetch origin
-git checkout $BRANCH_NAME
-
-# Review conflicts
-git status
-
-# Resolve conflicts in your editor, then:
-git add .
-git commit -m \"Resolve merge conflicts\"
-git push origin $BRANCH_NAME
-\`\`\`
-
----
-🤖 Generated automatically by [Sync Template Updates workflow](.github/workflows/sync-template.yml)"
+            echo "## ⚠️ Template Updates (Merge Conflicts)" > "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "This PR syncs updates from the template repository but has **merge conflicts** that need manual resolution." >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "### What to do:" >> "$PR_BODY_FILE"
+            echo "1. Review the conflicts in the Files Changed tab" >> "$PR_BODY_FILE"
+            echo "2. Resolve conflicts locally or using GitHub's conflict editor" >> "$PR_BODY_FILE"
+            echo "3. Test the changes" >> "$PR_BODY_FILE"
+            echo "4. Merge when ready" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "### Updates" >> "$PR_BODY_FILE"
+            echo "- Template commits: $UPDATE_COUNT new commits" >> "$PR_BODY_FILE"
+            echo "- Status: ⚠️ Has conflicts" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "### Conflict Resolution Help" >> "$PR_BODY_FILE"
+            echo '```bash' >> "$PR_BODY_FILE"
+            echo "# Check out this branch" >> "$PR_BODY_FILE"
+            echo "git fetch origin" >> "$PR_BODY_FILE"
+            echo "git checkout $BRANCH_NAME" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "# Review conflicts" >> "$PR_BODY_FILE"
+            echo "git status" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "# Resolve conflicts in your editor, then:" >> "$PR_BODY_FILE"
+            echo "git add ." >> "$PR_BODY_FILE"
+            echo 'git commit -m "Resolve merge conflicts"' >> "$PR_BODY_FILE"
+            echo "git push origin $BRANCH_NAME" >> "$PR_BODY_FILE"
+            echo '```' >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "---" >> "$PR_BODY_FILE"
+            echo "🤖 Generated automatically by [Sync Template Updates workflow](.github/workflows/sync-template.yml)" >> "$PR_BODY_FILE"
           else
-            PR_BODY="## ✨ Template Updates Available
-
-This PR syncs updates from the template repository.
-
-### What's included:
-- Template commits: $UPDATE_COUNT new commits
-- Status: ✅ Clean merge (no conflicts)
-
-### Review checklist:
-- [ ] Review changes in Files Changed tab
-- [ ] Check for any custom modifications that need preservation
-- [ ] Test in a non-production environment if significant changes
-- [ ] Merge when ready
-
-### Viewing changes:
-\`\`\`bash
-# Check out this branch locally to test
-git fetch origin
-git checkout $BRANCH_NAME
-
-# Run validation
-terraform fmt -check -recursive
-terraform validate
-\`\`\`
-
----
-🤖 Generated automatically by [Sync Template Updates workflow](.github/workflows/sync-template.yml)"
+            echo "## ✨ Template Updates Available" > "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "This PR syncs updates from the template repository." >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "### What's included:" >> "$PR_BODY_FILE"
+            echo "- Template commits: $UPDATE_COUNT new commits" >> "$PR_BODY_FILE"
+            echo "- Status: ✅ Clean merge (no conflicts)" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "### Review checklist:" >> "$PR_BODY_FILE"
+            echo "- [ ] Review changes in Files Changed tab" >> "$PR_BODY_FILE"
+            echo "- [ ] Check for any custom modifications that need preservation" >> "$PR_BODY_FILE"
+            echo "- [ ] Test in a non-production environment if significant changes" >> "$PR_BODY_FILE"
+            echo "- [ ] Merge when ready" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "### Viewing changes:" >> "$PR_BODY_FILE"
+            echo '```bash' >> "$PR_BODY_FILE"
+            echo "# Check out this branch locally to test" >> "$PR_BODY_FILE"
+            echo "git fetch origin" >> "$PR_BODY_FILE"
+            echo "git checkout $BRANCH_NAME" >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "# Run validation" >> "$PR_BODY_FILE"
+            echo "terraform fmt -check -recursive" >> "$PR_BODY_FILE"
+            echo "terraform validate" >> "$PR_BODY_FILE"
+            echo '```' >> "$PR_BODY_FILE"
+            echo "" >> "$PR_BODY_FILE"
+            echo "---" >> "$PR_BODY_FILE"
+            echo "🤖 Generated automatically by [Sync Template Updates workflow](.github/workflows/sync-template.yml)" >> "$PR_BODY_FILE"
           fi
 
-          # Create PR
+          # Create PR using body file
           gh pr create \
             --title "🔄 Sync template updates ($UPDATE_COUNT commits)" \
-            --body "$PR_BODY" \
+            --body-file "$PR_BODY_FILE" \
             --base main \
             --head "$BRANCH_NAME" \
             --label "template-sync" \
