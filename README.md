@@ -320,13 +320,21 @@ This template receives regular updates including new features, bug fixes, improv
 
 **Use the built-in sync workflow:**
 
-1. **One-time setup (create labels):**
+1. **One-time setup:**
+
+   a. **Create labels:**
    ```bash
    # Create labels for automated PRs
    gh label create template-sync --description "Automated template sync pull request" --color "0366d6"
    gh label create maintenance --description "Repository maintenance" --color "fbca04"
    ```
    Or create via GitHub web UI: **Issues → Labels → New label**
+
+   b. **Enable workflow PR permissions:**
+   - Go to **Settings → Actions → General**
+   - Under "Workflow permissions": Select **"Read and write permissions"**
+   - Check: **"Allow GitHub Actions to create and approve pull requests"**
+   - Click **"Save"**
 
 2. **Enable the workflow:**
    - Go to **Actions** tab in your repository

@@ -272,6 +272,41 @@ gh label create maintenance \
 - Makes it easy to identify automated template updates
 - Helps filter PRs in the Pull Requests tab
 
+### 3.5 Enable Workflow Permissions for PR Creation
+
+The sync-template workflow needs permission to create pull requests. Enable this setting:
+
+**Option 1: Using GitHub Web UI (Recommended)**
+
+1. Go to your repository on GitHub
+2. Navigate to **Settings → Actions → General**
+3. Scroll down to **"Workflow permissions"**
+4. Select: **"Read and write permissions"**
+5. Check the box: **"Allow GitHub Actions to create and approve pull requests"**
+6. Click **"Save"**
+
+**Option 2: Using GitHub CLI**
+
+```bash
+# Enable workflow PR creation (requires admin access)
+gh api repos/OWNER/REPO/actions/permissions \
+  --method PUT \
+  -f default_workflow_permissions=write \
+  -f can_approve_pull_request_reviews=true
+```
+
+Replace `OWNER/REPO` with your repository (e.g., `myorg/okta-terraform-demo`).
+
+**Why this is needed:**
+- The sync-template workflow automatically creates PRs with template updates
+- Without this permission, the workflow will fail with: "GitHub Actions is not permitted to create or approve pull requests"
+- This is a GitHub security setting that defaults to read-only for Actions
+
+**Security note:**
+- This only affects workflows in your repository
+- Workflows still require explicit triggers (schedule or manual dispatch)
+- PRs created by Actions are clearly marked as automated
+
 ---
 
 ## Step 4: Create Your First Okta Environment
