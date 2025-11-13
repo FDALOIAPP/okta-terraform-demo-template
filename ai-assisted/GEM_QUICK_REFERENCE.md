@@ -421,6 +421,101 @@ resource "okta_reviews" "quarterly_review" {
 
 ---
 
+## Infrastructure Patterns (AWS + Active Directory)
+
+### Directory Structure
+
+Infrastructure lives in separate directory from Okta resources:
+
+```
+environments/{env}/
+├── terraform/        # Okta resources (users, groups, apps)
+└── infrastructure/   # AWS resources (VPC, EC2, AD)
+```
+
+### Key Infrastructure Resources
+
+**VPC + Networking:**
+```hcl
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+}
+
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+}
+```
+
+**Security Group (AD Ports):**
+```hcl
+resource "aws_security_group" "domain_controller" {
+  vpc_id = aws_vpc.main.id
+}
+
+# RDP
+resource "aws_security_group_rule" "dc_rdp" {
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
+  cidr_blocks       = var.allowed_rdp_cidrs
+  security_group_id = aws_security_group.domain_controller.id
+}
+
+# DNS, LDAP, Kerberos, SMB, etc.
+```
+
+**Domain Controller EC2:**
+```hcl
+resource "aws_instance" "domain_controller" {
+  ami           = data.aws_ami.windows_2022.id
+  instance_type = "t3.medium"
+  subnet_id     = aws_subnet.public.id
+
+  user_data = templatefile("$${path.module}/scripts/userdata.ps1", {
+    admin_password        = var.admin_password
+    ad_domain_name        = var.ad_domain_name
+    ad_safe_mode_password = var.ad_safe_mode_password
+  })
+}
+
+resource "aws_eip" "dc" {
+  instance = aws_instance.domain_controller.id
+}
+```
+
+**Infrastructure Variables:**
+```hcl
+variable "ad_domain_name" {
+  type    = string
+  default = "demo.local"
+}
+
+variable "admin_password" {
+  type      = string
+  sensitive = true
+}
+```
+
+### When to Generate Infrastructure
+
+Generate infrastructure when user requests:
+- "Deploy AD infrastructure"
+- "Create Domain Controller"
+- "Set up Active Directory for Okta"
+
+**Key points:**
+- Use S3 backend with environment-specific key
+- Always include comprehensive security groups (DNS, LDAP, Kerberos, etc.)
+- Warn about RDP access restrictions
+- Use sensitive variables for passwords
+
+---
+
 ## What NOT to Generate
 
 **Don't generate Terraform for:**

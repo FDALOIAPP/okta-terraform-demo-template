@@ -286,6 +286,452 @@ resource "okta_app_group_assignment" "salesforce_marketing" {
 
 ---
 
+## Active Directory Infrastructure Patterns
+
+### Infrastructure Directory Structure
+
+Each environment can have AWS infrastructure for Active Directory integration:
+
+```
+environments/{env}/infrastructure/
+├── provider.tf              # AWS provider with S3 backend
+├── variables.tf             # Infrastructure variables
+├── vpc.tf                   # VPC, subnets, routing
+├── security-groups.tf       # AD ports + RDP
+├── ad-domain-controller.tf  # EC2 instance
+├── outputs.tf               # Connection info
+├── terraform.tfvars.example # Example config
+└── scripts/
+    └── userdata.ps1         # PowerShell automation
+```
+
+### When to Generate Infrastructure Code
+
+**Generate infrastructure when user requests:**
+- "Create Active Directory infrastructure"
+- "Deploy a Domain Controller"
+- "Set up AD for Okta integration"
+- "I need AD infrastructure for my demo"
+
+**Infrastructure file targets:**
+- Save to: `environments/{env}/infrastructure/{file}.tf`
+- NOT in the terraform/ directory (Okta resources go there)
+
+### AWS Provider Configuration
+
+**Always use S3 backend with per-environment state:**
+
+```hcl
+# provider.tf
+terraform {
+  required_version = ">= 1.9.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "okta-terraform-demo"
+    key            = "Okta-GitOps/{environment}/infrastructure/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "okta-terraform-state-lock"
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      Environment = var.environment_name
+      Project     = "Okta-Demo-Infrastructure"
+      ManagedBy   = "Terraform"
+    }
+  }
+}
+```
+
+### VPC Pattern
+
+**Create simple VPC with public subnet for DC:**
+
+```hcl
+# vpc.tf
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {
+    Name = "$${var.environment_name}-ad-vpc"
+  }
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "$${var.environment_name}-ad-igw"
+  }
+}
+
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.public_subnet_cidr
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "$${var.environment_name}-ad-public-subnet"
+  }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name = "$${var.environment_name}-ad-public-rt"
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.public.id
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+```
+
+### Security Group Pattern
+
+**Include ALL Active Directory ports:**
+
+```hcl
+# security-groups.tf
+resource "aws_security_group" "domain_controller" {
+  name        = "$${var.environment_name}-ad-dc-sg"
+  description = "Security group for Active Directory Domain Controller"
+  vpc_id      = aws_vpc.main.id
+}
+
+# RDP
+resource "aws_security_group_rule" "dc_rdp" {
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
+  cidr_blocks       = var.allowed_rdp_cidrs
+  security_group_id = aws_security_group.domain_controller.id
+}
+
+# DNS
+resource "aws_security_group_rule" "dc_dns_tcp" {
+  type              = "ingress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_security_group.domain_controller.id
+}
+
+# LDAP
+resource "aws_security_group_rule" "dc_ldap" {
+  type              = "ingress"
+  from_port         = 389
+  to_port           = 389
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_security_group.domain_controller.id
+}
+
+# Kerberos
+resource "aws_security_group_rule" "dc_kerberos_tcp" {
+  type              = "ingress"
+  from_port         = 88
+  to_port           = 88
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_security_group.domain_controller.id
+}
+
+# SMB
+resource "aws_security_group_rule" "dc_smb" {
+  type              = "ingress"
+  from_port         = 445
+  to_port           = 445
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_security_group.domain_controller.id
+}
+
+# Egress all
+resource "aws_security_group_rule" "dc_egress_all" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.domain_controller.id
+}
+```
+
+### Domain Controller EC2 Pattern
+
+```hcl
+# ad-domain-controller.tf
+data "aws_ami" "windows_2022" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+}
+
+resource "aws_instance" "domain_controller" {
+  ami           = data.aws_ami.windows_2022.id
+  instance_type = var.dc_instance_type
+  subnet_id     = aws_subnet.public.id
+
+  vpc_security_group_ids = [aws_security_group.domain_controller.id]
+
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = var.dc_volume_size
+    encrypted   = true
+  }
+
+  # User data for automation
+  user_data = templatefile("$${path.module}/scripts/userdata.ps1", {
+    admin_password        = var.admin_password
+    ad_domain_name        = var.ad_domain_name
+    ad_netbios_name       = var.ad_netbios_name
+    ad_safe_mode_password = var.ad_safe_mode_password
+    okta_org_url          = var.okta_org_url
+  })
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  tags = {
+    Name = "$${var.environment_name}-ad-dc"
+    Role = "Domain-Controller"
+  }
+
+  lifecycle {
+    ignore_changes = [ami, user_data]
+  }
+}
+
+resource "aws_eip" "dc" {
+  instance = aws_instance.domain_controller.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "$${var.environment_name}-ad-dc-eip"
+  }
+}
+```
+
+### Infrastructure Variables Pattern
+
+```hcl
+# variables.tf
+variable "environment_name" {
+  description = "Environment name"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_cidr" {
+  description = "VPC CIDR block"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "ad_domain_name" {
+  description = "AD domain name (e.g., demo.local)"
+  type        = string
+  default     = "demo.local"
+}
+
+variable "ad_netbios_name" {
+  description = "AD NetBIOS name"
+  type        = string
+  default     = "DEMO"
+}
+
+variable "admin_password" {
+  description = "Windows Administrator password"
+  type        = string
+  sensitive   = true
+}
+
+variable "ad_safe_mode_password" {
+  description = "AD Safe Mode password"
+  type        = string
+  sensitive   = true
+}
+
+variable "okta_org_url" {
+  description = "Okta organization URL"
+  type        = string
+}
+
+variable "dc_instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t3.medium"
+}
+
+variable "allowed_rdp_cidrs" {
+  description = "CIDR blocks allowed to RDP"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]  # WARN: Should restrict this
+}
+```
+
+### Infrastructure Outputs Pattern
+
+```hcl
+# outputs.tf
+output "dc_public_ip" {
+  description = "Public IP of Domain Controller"
+  value       = aws_eip.dc.public_ip
+}
+
+output "dc_private_ip" {
+  description = "Private IP of Domain Controller"
+  value       = aws_instance.domain_controller.private_ip
+}
+
+output "rdp_connection_string" {
+  description = "RDP connection command"
+  value       = "mstsc /v:$${aws_eip.dc.public_ip}"
+}
+
+output "next_steps" {
+  description = "Next steps after deployment"
+  value       = <<-EOT
+    === Domain Controller Deployed ===
+
+    1. Wait 15-20 minutes for automated setup
+    2. Connect via RDP: $${aws_eip.dc.public_ip}
+    3. Username: Administrator
+    4. Password: [set via TF_VAR_admin_password]
+    5. Install Okta AD Agent: C:\\Terraform\\OktaADAgentSetup.exe
+    6. Configure AD sync in Okta Admin Console
+  EOT
+}
+```
+
+### PowerShell User Data Basics
+
+**When generating userdata.ps1, include:**
+
+1. **PowerShell wrapper:**
+```powershell
+<powershell>
+# Script content here
+</powershell>
+```
+
+2. **Logging setup:**
+```powershell
+$LogFile = "C:\\Terraform\\bootstrap.log"
+New-Item -ItemType Directory -Path "C:\\Terraform" -Force
+
+function Write-Log {
+    param([string]$Message)
+    Add-Content -Path $LogFile -Value "$((Get-Date).ToString()) - $Message"
+}
+```
+
+3. **Set Administrator password:**
+```powershell
+$AdminPassword = ConvertTo-SecureString "${admin_password}" -AsPlainText -Force
+$Admin = [ADSI]"WinNT://./Administrator,user"
+$Admin.SetPassword("${admin_password}")
+```
+
+4. **Install AD role:**
+```powershell
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+```
+
+5. **Scheduled task for DC promotion:**
+```powershell
+# Create script that runs after reboot
+$PromotionScript = @"
+Install-ADDSForest -DomainName "${ad_domain_name}" ``
+    -DomainNetbiosName "${ad_netbios_name}" ``
+    -SafeModeAdministratorPassword (ConvertTo-SecureString "${ad_safe_mode_password}" -AsPlainText -Force) ``
+    -InstallDns -Force
+"@
+
+# Save and schedule
+$PromotionScript | Out-File "C:\\Terraform\\promote-dc.ps1"
+# Register scheduled task to run at startup
+```
+
+### Infrastructure Security Best Practices
+
+1. **Passwords:** Always use sensitive variables, never hardcode
+2. **RDP Access:** Default to `0.0.0.0/0` but WARN user to restrict
+3. **Encryption:** Enable EBS encryption
+4. **IMDSv2:** Require metadata service v2
+5. **Tags:** Include environment, project, managed-by tags
+
+### Infrastructure Example Scenarios
+
+**Scenario: "Deploy AD infrastructure for demo environment"**
+
+Generate:
+- provider.tf (S3 backend for demo environment)
+- variables.tf (all AD variables)
+- vpc.tf (simple VPC with public subnet)
+- security-groups.tf (AD ports + RDP)
+- ad-domain-controller.tf (EC2 with Windows 2022)
+- outputs.tf (connection info)
+
+**Scenario: "Create Domain Controller with custom domain name"**
+
+Generate ad-domain-controller.tf with:
+- Custom ad_domain_name variable
+- Custom ad_netbios_name variable
+- Appropriate outputs
+
+**Scenario: "Add additional security groups for AD"**
+
+Generate security-groups.tf with all AD ports:
+- DNS (53 TCP/UDP)
+- Kerberos (88 TCP/UDP)
+- LDAP (389 TCP/UDP)
+- LDAPS (636 TCP)
+- SMB (445 TCP)
+- Global Catalog (3268-3269 TCP)
+- RPC Dynamic (49152-65535 TCP)
+
+---
+
 ## Common Pitfalls to Avoid
 
 ### ❌ Don't Generate These (Not in Terraform Provider)
