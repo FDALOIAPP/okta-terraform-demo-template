@@ -230,6 +230,48 @@ For **development/staging**, lighter protection is acceptable:
 - No wait timer
 - Self-approval allowed
 
+### 3.4 Create Repository Labels
+
+The template sync workflow uses labels to mark automated PRs. Create these labels:
+
+**Option 1: Using GitHub CLI**
+
+```bash
+# Create template-sync label
+gh label create template-sync \
+  --description "Automated template sync pull request" \
+  --color "0366d6"
+
+# Create maintenance label
+gh label create maintenance \
+  --description "Repository maintenance" \
+  --color "fbca04"
+```
+
+**Option 2: Using GitHub Web UI**
+
+1. Go to your repository on GitHub
+2. Navigate to **Issues** or **Pull Requests** tab
+3. Click **"Labels"** (in the sub-navigation)
+4. Click **"New label"**
+
+**Create label 1:**
+- Name: `template-sync`
+- Description: `Automated template sync pull request`
+- Color: `#0366d6` (blue)
+- Click **"Create label"**
+
+**Create label 2:**
+- Name: `maintenance`
+- Description: `Repository maintenance`
+- Color: `#fbca04` (yellow)
+- Click **"Create label"**
+
+**Why these labels?**
+- The sync-template workflow automatically applies these labels to PRs
+- Makes it easy to identify automated template updates
+- Helps filter PRs in the Pull Requests tab
+
 ---
 
 ## Step 4: Create Your First Okta Environment

@@ -320,18 +320,26 @@ This template receives regular updates including new features, bug fixes, improv
 
 **Use the built-in sync workflow:**
 
-1. **Enable the workflow:**
+1. **One-time setup (create labels):**
+   ```bash
+   # Create labels for automated PRs
+   gh label create template-sync --description "Automated template sync pull request" --color "0366d6"
+   gh label create maintenance --description "Repository maintenance" --color "fbca04"
+   ```
+   Or create via GitHub web UI: **Issues → Labels → New label**
+
+2. **Enable the workflow:**
    - Go to **Actions** tab in your repository
    - Find "Sync Template Updates" workflow
    - Click "Enable workflow" if needed
 
-2. **Run manually anytime:**
+3. **Run manually anytime:**
    ```bash
    gh workflow run sync-template.yml
    ```
    Or click "Run workflow" in the Actions tab
 
-3. **Review the PR:**
+4. **Review the PR:**
    - Workflow creates a PR with template updates
    - Review changes in the PR
    - Merge when ready
