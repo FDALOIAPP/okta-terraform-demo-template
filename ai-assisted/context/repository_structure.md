@@ -8,7 +8,7 @@ This document provides context about the Okta Terraform Complete Demo repository
 okta-terraform-complete-demo/
 ├── environments/
 │   ├── lowerdecklabs/          # Example tenant environment
-│   │   ├── terraform/          # Terraform configurations
+│   │   ├── terraform/          # Terraform configurations (Okta resources)
 │   │   │   ├── provider.tf     # Okta provider configuration
 │   │   │   ├── variables.tf    # Variable definitions
 │   │   │   ├── users.tf        # User resources
@@ -16,6 +16,15 @@ okta-terraform-complete-demo/
 │   │   │   ├── apps.tf         # Application resources
 │   │   │   ├── oig_entitlements.tf  # OIG entitlement bundles
 │   │   │   └── oig_reviews.tf  # OIG access reviews
+│   │   ├── infrastructure/     # Terraform configurations (AWS infrastructure)
+│   │   │   ├── provider.tf     # AWS provider with S3 backend
+│   │   │   ├── variables.tf    # Infrastructure variables
+│   │   │   ├── vpc.tf          # VPC and networking
+│   │   │   ├── security-groups.tf  # Security groups (AD ports)
+│   │   │   ├── ad-domain-controller.tf  # EC2 Domain Controller
+│   │   │   ├── outputs.tf      # Infrastructure outputs
+│   │   │   ├── scripts/        # PowerShell automation scripts
+│   │   │   └── terraform.tfvars.example  # Example variables
 │   │   ├── imports/            # Imported JSON data
 │   │   └── config/             # Configuration files
 │   ├── production/             # Production environment (template)
@@ -52,6 +61,19 @@ Each resource type has its own file:
 - `policies.tf` - MFA and other policies
 - `oig_entitlements.tf` - OIG entitlement bundles
 - `oig_reviews.tf` - OIG access review campaigns
+
+### Infrastructure Files (Optional)
+Active Directory infrastructure files (in `infrastructure/` subdirectory):
+- `provider.tf` - AWS provider with S3 backend configuration
+- `variables.tf` - Infrastructure input variables (passwords, domain names)
+- `vpc.tf` - VPC, subnets, internet gateway, routing tables
+- `security-groups.tf` - Security groups with AD ports (DNS, LDAP, Kerberos, RDP)
+- `ad-domain-controller.tf` - EC2 instance configured as Domain Controller
+- `outputs.tf` - Connection info, next steps instructions
+- `scripts/userdata.ps1` - PowerShell script for automated DC setup
+- `terraform.tfvars.example` - Example configuration template
+- `.gitignore` - Protect sensitive files (*.tfvars, *.tfstate)
+- `README.md` - Comprehensive deployment guide
 
 ## Naming Conventions
 
@@ -91,9 +113,37 @@ resource "okta_group_memberships" "example" {
 ## Environment-Specific Paths
 
 When generating code for a specific environment, use:
-- Terraform files: `environments/{env}/terraform/`
+- Okta Terraform files: `environments/{env}/terraform/`
+- Infrastructure files: `environments/{env}/infrastructure/`
 - Imports: `environments/{env}/imports/`
 - Config: `environments/{env}/config/`
 
 Example for lowerdecklabs:
-- `environments/lowerdecklabs/terraform/users.tf`
+- `environments/lowerdecklabs/terraform/users.tf` (Okta resources)
+- `environments/lowerdecklabs/infrastructure/vpc.tf` (AWS resources)
+
+## Infrastructure Patterns
+
+### When to Generate Infrastructure
+Generate infrastructure code when the user requests:
+- Active Directory integration or Domain Controller setup
+- Windows Server deployment
+- VPC or AWS networking setup
+- "AD Agent" or "Okta AD integration" infrastructure
+
+### Infrastructure Directory Structure
+Infrastructure is SEPARATE from Okta Terraform:
+- **Location:** `environments/{env}/infrastructure/`
+- **Provider:** AWS (not Okta)
+- **State:** Separate S3 backend (`{env}/infrastructure/terraform.tfstate`)
+- **Purpose:** Supporting infrastructure for Okta integrations
+
+### Infrastructure vs Okta Resources
+**Never mix infrastructure and Okta resources in the same file!**
+
+```
+terraform/           → Okta provider (okta_user, okta_group, etc.)
+infrastructure/      → AWS provider (aws_vpc, aws_instance, etc.)
+```
+
+Each has its own provider, state, and backend configuration.

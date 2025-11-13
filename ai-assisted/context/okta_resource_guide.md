@@ -161,6 +161,48 @@ Some OIG features are API-only (not in Terraform):
 - Governance labels (use Python scripts: `scripts/apply_governance_labels.py`)
 - Principal assignments to bundles (manage via Okta Admin Console)
 
+## Infrastructure Resources (AWS)
+
+**Important:** Infrastructure resources are in `environments/{env}/infrastructure/`, NOT in `terraform/` directory.
+
+### aws_vpc
+VPC for Active Directory infrastructure
+- **Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
+- **Use for:** Creating isolated network for Domain Controller
+- **Typical CIDR:** 10.0.0.0/16
+
+### aws_subnet
+Subnets within VPC
+- **Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet
+- **Use for:** Public subnet for Domain Controller, private subnet for future resources
+
+### aws_security_group
+Firewall rules for EC2 instances
+- **Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group
+- **Use for:** Opening Active Directory ports (DNS 53, LDAP 389, Kerberos 88, SMB 445, RDP 3389, etc.)
+- **Critical:** Must include ALL AD ports for proper functionality
+
+### aws_instance
+EC2 instances (Windows Server)
+- **Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
+- **Use for:** Domain Controller (Windows Server 2022)
+- **AMI:** Use data source to find latest Windows Server 2022 AMI
+- **Instance type:** t3.medium minimum for Domain Controller
+- **User data:** PowerShell script for automated DC promotion
+
+### aws_eip
+Elastic IP for stable public address
+- **Docs:** https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip
+- **Use for:** Providing stable IP for RDP access and Okta AD Agent connection
+
+### Infrastructure Typical Flow
+1. Create VPC and networking (`aws_vpc`, `aws_subnet`, `aws_internet_gateway`)
+2. Set up security groups with AD ports (`aws_security_group`)
+3. Deploy Domain Controller EC2 instance (`aws_instance`)
+4. Assign Elastic IP (`aws_eip`)
+5. Wait for automated setup (PowerShell user_data script)
+6. Install Okta AD Agent manually (installer is pre-downloaded)
+
 ## Additional Resources
 
 - **Full Resource Catalog:** `docs/TERRAFORM_RESOURCES.md`

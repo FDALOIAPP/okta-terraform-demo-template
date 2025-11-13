@@ -241,6 +241,397 @@ resource "okta_policy_rule_mfa" "require_mfa" {
 }
 ```
 
+## Infrastructure Examples (AWS)
+
+**Important:** These go in `environments/{env}/infrastructure/`, NOT `terraform/` directory.
+
+### VPC and Networking
+```hcl
+# Data source for availability zones
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+# VPC
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {
+    Name        = "okta-ad-vpc"
+    Environment = var.environment_name
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name        = "okta-ad-igw"
+    Environment = var.environment_name
+  }
+}
+
+# Public Subnet
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[0]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name        = "okta-ad-public-subnet"
+    Environment = var.environment_name
+  }
+}
+
+# Route Table
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name        = "okta-ad-public-rt"
+    Environment = var.environment_name
+  }
+}
+
+# Route Table Association
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.public.id
+}
+```
+
+### Security Group (Active Directory Ports)
+```hcl
+resource "aws_security_group" "domain_controller" {
+  name        = "okta-ad-dc-sg"
+  description = "Security group for Active Directory Domain Controller"
+  vpc_id      = aws_vpc.main.id
+
+  # RDP
+  ingress {
+    description = "RDP"
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_rdp_cidrs
+  }
+
+  # DNS TCP/UDP
+  ingress {
+    description = "DNS TCP"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "DNS UDP"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kerberos TCP/UDP
+  ingress {
+    description = "Kerberos TCP"
+    from_port   = 88
+    to_port     = 88
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Kerberos UDP"
+    from_port   = 88
+    to_port     = 88
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # LDAP TCP/UDP
+  ingress {
+    description = "LDAP TCP"
+    from_port   = 389
+    to_port     = 389
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "LDAP UDP"
+    from_port   = 389
+    to_port     = 389
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # SMB/CIFS
+  ingress {
+    description = "SMB"
+    from_port   = 445
+    to_port     = 445
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # LDAPS
+  ingress {
+    description = "LDAPS"
+    from_port   = 636
+    to_port     = 636
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Dynamic RPC (required for AD)
+  ingress {
+    description = "Dynamic RPC"
+    from_port   = 49152
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Outbound (allow all)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "okta-ad-dc-sg"
+    Environment = var.environment_name
+  }
+}
+```
+
+### Domain Controller EC2 Instance
+```hcl
+# Data source for Windows Server 2022 AMI
+data "aws_ami" "windows_2022" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+# Domain Controller Instance
+resource "aws_instance" "domain_controller" {
+  ami           = data.aws_ami.windows_2022.id
+  instance_type = var.dc_instance_type
+  subnet_id     = aws_subnet.public.id
+
+  vpc_security_group_ids = [
+    aws_security_group.domain_controller.id
+  ]
+
+  # User data for automated setup
+  user_data = templatefile("${path.module}/scripts/userdata.ps1", {
+    admin_password        = var.admin_password
+    ad_domain_name        = var.ad_domain_name
+    ad_netbios_name       = var.ad_netbios_name
+    ad_safe_mode_password = var.ad_safe_mode_password
+    okta_org_url          = var.okta_org_url
+    environment_name      = var.environment_name
+  })
+
+  # IMDSv2 for enhanced security
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
+  # Ignore AMI and user_data changes
+  lifecycle {
+    ignore_changes = [ami, user_data]
+  }
+
+  tags = {
+    Name        = "${var.ad_netbios_name}-DC01"
+    Environment = var.environment_name
+    Role        = "Domain Controller"
+  }
+}
+
+# Elastic IP
+resource "aws_eip" "dc" {
+  instance = aws_instance.domain_controller.id
+  domain   = "vpc"
+
+  tags = {
+    Name        = "okta-ad-dc-eip"
+    Environment = var.environment_name
+  }
+}
+```
+
+### Infrastructure Variables
+```hcl
+variable "environment_name" {
+  description = "Environment name (production, staging, development)"
+  type        = string
+  default     = "production"
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "ad_domain_name" {
+  description = "Active Directory domain name (e.g., demo.local)"
+  type        = string
+  default     = "demo.local"
+}
+
+variable "ad_netbios_name" {
+  description = "Active Directory NetBIOS name (e.g., DEMO)"
+  type        = string
+  default     = "DEMO"
+}
+
+variable "admin_password" {
+  description = "Administrator password for Windows Server"
+  type        = string
+  sensitive   = true
+}
+
+variable "ad_safe_mode_password" {
+  description = "Active Directory Safe Mode password"
+  type        = string
+  sensitive   = true
+}
+
+variable "okta_org_url" {
+  description = "Okta organization URL for AD Agent download"
+  type        = string
+}
+
+variable "dc_instance_type" {
+  description = "EC2 instance type for Domain Controller"
+  type        = string
+  default     = "t3.medium"
+}
+
+variable "allowed_rdp_cidrs" {
+  description = "CIDR blocks allowed for RDP access"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+```
+
+### Infrastructure Outputs
+```hcl
+output "vpc_id" {
+  description = "VPC ID"
+  value       = aws_vpc.main.id
+}
+
+output "dc_instance_id" {
+  description = "Domain Controller instance ID"
+  value       = aws_instance.domain_controller.id
+}
+
+output "dc_public_ip" {
+  description = "Domain Controller public IP"
+  value       = aws_eip.dc.public_ip
+}
+
+output "dc_private_ip" {
+  description = "Domain Controller private IP"
+  value       = aws_instance.domain_controller.private_ip
+}
+
+output "ad_domain_name" {
+  description = "Active Directory domain name"
+  value       = var.ad_domain_name
+}
+
+output "rdp_connection_string" {
+  description = "RDP connection string"
+  value       = "mstsc /v:${aws_eip.dc.public_ip} (Username: Administrator)"
+}
+
+output "next_steps" {
+  description = "Next steps after deployment"
+  value       = <<-EOT
+    Deployment complete! Next steps:
+
+    1. Wait 15-20 minutes for automated setup
+    2. Connect via RDP: ${aws_eip.dc.public_ip}
+    3. Username: Administrator
+    4. Password: <value from admin_password variable>
+    5. Check setup logs: C:\Terraform\bootstrap.log
+    6. Install Okta AD Agent: C:\Terraform\OktaADAgentSetup.exe
+    7. Configure Okta AD integration in Admin Console
+  EOT
+}
+```
+
+### AWS Provider Configuration
+```hcl
+terraform {
+  required_version = ">= 1.9.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  # S3 backend for state storage
+  backend "s3" {
+    bucket         = "okta-terraform-demo"
+    key            = "Okta-GitOps/production/infrastructure/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "okta-terraform-state-lock"
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = "Okta-Active-Directory"
+      Environment = var.environment_name
+      ManagedBy   = "Terraform"
+    }
+  }
+}
+```
+
 ## Best Practices
 
 ### 1. Always Use Status = "ACTIVE"
