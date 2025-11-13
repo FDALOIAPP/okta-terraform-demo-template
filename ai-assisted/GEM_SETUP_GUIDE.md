@@ -14,6 +14,10 @@ This guide walks you through creating your own personalized Gemini Gem for gener
 6. [Example Prompts](#example-prompts)
 7. [Troubleshooting](#troubleshooting)
 8. [Updating Your Gem](#updating-your-gem)
+9. [Sharing Your Gem with Your Team](#sharing-your-gem-with-your-team)
+10. [GitHub Integration (No Git Required)](#github-integration-no-git-required)
+11. [Cost Considerations](#cost-considerations)
+12. [Tips for Best Results](#tips-for-best-results)
 
 ---
 
@@ -50,6 +54,7 @@ This guide walks you through creating your own personalized Gemini Gem for gener
 - Don't want to install Python locally
 - Want to share with Solutions Engineers who aren't developers
 - Need access from any device (laptop, tablet, phone)
+- **Don't have git installed** and want to use GitHub web UI only (see [GitHub Integration](#github-integration-no-git-required))
 
 ---
 
@@ -400,7 +405,7 @@ As this repository evolves, you may need to update your Gem.
 
 ---
 
-## Sharing Your Gem with Team
+## Sharing Your Gem with Your Team
 
 ### Option 1: Direct Sharing (Google Workspace)
 
