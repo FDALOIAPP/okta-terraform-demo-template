@@ -48,6 +48,7 @@ This template provides everything you need to manage Okta with GitOps:
 - ✅ **Multi-tenant structure** - Manage multiple Okta organizations
 - ✅ **GitHub Actions workflows** - Automated validation, planning, and deployment
 - ✅ **AWS S3 state backend** - Team collaboration with state locking
+- ✅ **AD infrastructure automation** - Deploy Windows Server Domain Controller with automated setup
 - ✅ **Python automation scripts** - Resource owners, labels, and bulk operations
 - ✅ **AI-assisted generation** - Quickly create demo environments
 - ✅ **Comprehensive documentation** - Guides for every scenario
@@ -104,6 +105,76 @@ cp environments/production/config/* environments/mycompany/config/
 - Best practices for multi-tenant management
 
 **📋 Want to use OIG features?** See **[OIG_PREREQUISITES.md](./OIG_PREREQUISITES.md)** for required setup steps (Entitlement Management must be enabled manually in GUI).
+
+---
+
+## 🖥️ Active Directory Infrastructure (Optional)
+
+Each environment can include AWS infrastructure for Active Directory integration with Okta.
+
+### What's Included
+
+**Per-environment infrastructure** (`environments/{env}/infrastructure/`):
+- **Windows Server 2022 EC2 instance** configured as Domain Controller
+- **Automated AD setup** - Promotes to DC, creates OUs, groups, and sample users
+- **VPC with public/private subnets** - Isolated network per environment
+- **Security groups** - All necessary AD and RDP ports pre-configured
+- **Okta AD Agent installer** - Automatically downloaded and ready to install
+- **Okta Privileged Access** - Optional RDP access integration
+
+### Quick Deploy
+
+```bash
+# Navigate to environment infrastructure
+cd environments/mycompany/infrastructure
+
+# Configure variables
+cp terraform.tfvars.example terraform.tfvars
+export TF_VAR_admin_password="YourPassword123!"
+export TF_VAR_ad_safe_mode_password="YourSafeModePassword123!"
+export TF_VAR_okta_org_url="https://dev-12345.okta.com"
+
+# Deploy
+terraform init
+terraform apply
+
+# Wait 15-20 minutes for automated setup, then connect via RDP
+```
+
+### What Gets Configured Automatically
+
+After `terraform apply`, the Domain Controller will automatically:
+
+1. ✅ Rename computer to `{NETBIOS}-DC01`
+2. ✅ Install AD-Domain-Services role
+3. ✅ Promote to Domain Controller
+4. ✅ Create OU structure (IT, HR, Finance, Sales, etc.)
+5. ✅ Create security groups (department teams, admin groups)
+6. ✅ Create sample users with realistic names (default password: `Welcome123!`)
+7. ✅ Download Okta AD Agent installer to `C:\Terraform\`
+
+**Total setup time:** ~15-20 minutes
+
+### Next Steps After Deployment
+
+1. **Connect via RDP** using public IP from outputs
+2. **Verify AD setup** - Open "Active Directory Users and Computers"
+3. **Install Okta AD Agent** - Run `C:\Terraform\OktaADAgentSetup.exe`
+4. **Configure Okta AD integration** in Admin Console
+5. **Test synchronization** from AD to Okta
+
+### Cost Estimate
+
+~$35-40/month for t3.medium instance with 50GB storage (stop when not in use to save costs)
+
+**[→ See Infrastructure README](./environments/production/infrastructure/README.md)** for complete guide including:
+- Detailed architecture
+- Security best practices
+- Customization options
+- Troubleshooting guide
+- Okta Privileged Access setup
+
+---
 
 ## 🎯 Okta Identity Governance Features
 
