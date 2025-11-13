@@ -134,45 +134,82 @@ class OIGImporter:
             print(f"  ⚠️  Could not fetch reviews: {e}")
             return []
 
-    def fetch_request_sequences(self) -> List[Dict]:
-        """Fetch all approval workflows"""
-        print("Fetching approval workflows...")
-        try:
-            url = f"{self.base_url}/governance/api/v1/request-sequences"
-            params = {"limit": 200}
-            response = self._make_request("GET", url, params=params)
-            sequences = response.json().get("data", [])
-            print(f"  Found {len(sequences)} approval workflows")
-            return sequences
-        except Exception as e:
-            print(f"  ⚠️  Could not fetch request sequences: {e}")
+    def fetch_request_sequences(self, entitlement_bundles: List[Dict]) -> List[Dict]:
+        """
+        Fetch all approval workflows (request sequences).
+
+        Note: API v2 requires request sequences to be fetched per-resource.
+        We iterate through entitlement bundles and collect unique sequences.
+
+        API: GET /governance/api/v2/resources/{resourceId}/request-sequences
+        """
+        print("Fetching approval workflows (request sequences)...")
+        all_sequences = {}  # Use dict to deduplicate by ID
+
+        if not entitlement_bundles:
+            print("  ℹ️  No entitlement bundles to query for sequences")
             return []
+
+        # Sample a few bundles to find sequences (most bundles share sequences)
+        sample_size = min(5, len(entitlement_bundles))
+        print(f"  Sampling {sample_size} of {len(entitlement_bundles)} bundles for sequences...")
+
+        for bundle in entitlement_bundles[:sample_size]:
+            bundle_id = bundle.get("id") or bundle.get("bundleId")
+            if not bundle_id:
+                continue
+
+            try:
+                # v2 API endpoint with resourceId
+                url = f"{self.base_url}/governance/api/v2/resources/{bundle_id}/request-sequences"
+                params = {"limit": 200}
+                response = self._make_request("GET", url, params=params)
+                sequences = response.json().get("data", [])
+
+                # Add to dict to deduplicate
+                for seq in sequences:
+                    seq_id = seq.get("id")
+                    if seq_id and seq_id not in all_sequences:
+                        all_sequences[seq_id] = seq
+
+            except Exception as e:
+                # Expected for bundles without sequences - continue silently
+                continue
+
+        sequences_list = list(all_sequences.values())
+        print(f"  Found {len(sequences_list)} unique approval workflows")
+        return sequences_list
 
     def fetch_catalog_entries(self) -> List[Dict]:
-        """Fetch all catalog entries"""
+        """
+        Fetch all catalog entries.
+
+        Note: This endpoint is not currently used for imports.
+        Catalog entries are managed through request conditions in v2 API.
+        Keeping for backwards compatibility but returning empty list.
+        """
         print("Fetching catalog entries...")
-        try:
-            url = f"{self.base_url}/governance/api/v1/catalog/entries"
-            params = {"limit": 200}
-            response = self._make_request("GET", url, params=params)
-            entries = response.json().get("data", [])
-            print(f"  Found {len(entries)} catalog entries")
-            return entries
-        except Exception as e:
-            print(f"  ⚠️  Could not fetch catalog entries: {e}")
-            return []
+        print("  ℹ️  Catalog entries import not currently supported")
+        print("  ℹ️  Use request conditions API instead (v2)")
+        return []
 
     def fetch_request_settings(self) -> Optional[Dict]:
-        """Fetch global request settings"""
-        print("Fetching request settings...")
+        """
+        Fetch organization-level request settings.
+
+        API: GET /governance/api/v2/request-settings (org-level)
+        """
+        print("Fetching organization request settings...")
         try:
-            url = f"{self.base_url}/governance/api/v1/request-settings"
+            # v2 API endpoint (org-level)
+            url = f"{self.base_url}/governance/api/v2/request-settings"
             response = self._make_request("GET", url)
             settings = response.json()
-            print(f"  Found request settings")
+            print(f"  ✅ Found organization request settings")
             return settings
         except Exception as e:
             print(f"  ⚠️  Could not fetch request settings: {e}")
+            print(f"  ℹ️  This may be expected if request settings are not configured")
             return None
 
     def generate_entitlement_tf(self, bundles: List[Dict]) -> tuple[str, List[str]]:
@@ -513,7 +550,7 @@ class OIGImporter:
         # Reviews are individual access review decisions, not campaign definitions
         # For campaign management, use the Okta Admin Console
         reviews = []  # self.fetch_reviews() - disabled by default
-        sequences = self.fetch_request_sequences()
+        sequences = self.fetch_request_sequences(entitlements)  # Pass bundles for v2 API
         catalog_entries = self.fetch_catalog_entries()
         request_settings = self.fetch_request_settings()
 

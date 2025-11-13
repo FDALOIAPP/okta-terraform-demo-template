@@ -14,6 +14,7 @@ Usage:
 import os
 import sys
 import json
+import time
 import requests
 import argparse
 from typing import Dict, List
@@ -37,7 +38,12 @@ class OwnerMappingSync:
         self.session.headers.update(self.headers)
 
     def get_resource_owners(self, resource_orn: str) -> List[Dict]:
-        """Query owners for a specific resource"""
+        """
+        Query owners for a specific resource with retry logic and rate limiting.
+
+        Implements exponential backoff for 429 (rate limit) errors and
+        adds a small delay between requests to prevent hitting rate limits.
+        """
         url = f"{self.governance_base}/resource-owners"
         filter_expr = f'parentResourceOrn eq "{resource_orn}"'
         params = {
@@ -45,20 +51,62 @@ class OwnerMappingSync:
             "limit": 200
         }
 
-        try:
-            response = self.session.get(url, params=params)
-            response.raise_for_status()
-            data = response.json()
-            return data.get("data", [])
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                # Resource owners not available or resource not found
+        max_retries = 3
+        base_delay = 1  # Start with 1 second delay
+
+        for attempt in range(max_retries):
+            try:
+                # Add small delay before each request to avoid rate limits
+                if attempt > 0:
+                    # Exponential backoff: 1s, 2s, 4s
+                    delay = base_delay * (2 ** attempt)
+                    print(f"  ⏳ Retry {attempt}/{max_retries} after {delay}s delay...")
+                    time.sleep(delay)
+                else:
+                    # Small delay even on first attempt to space out requests
+                    time.sleep(0.1)
+
+                response = self.session.get(url, params=params, timeout=30)
+                response.raise_for_status()
+                data = response.json()
+                return data.get("data", [])
+
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 404:
+                    # Resource owners not available or resource not found
+                    return []
+                elif e.response.status_code == 429:
+                    # Rate limit hit - retry with backoff
+                    if attempt < max_retries - 1:
+                        retry_after = e.response.headers.get('Retry-After', base_delay * (2 ** attempt))
+                        try:
+                            retry_after = int(retry_after)
+                        except ValueError:
+                            retry_after = base_delay * (2 ** attempt)
+                        print(f"  ⚠️  Rate limit hit for {resource_orn}, retrying after {retry_after}s...")
+                        time.sleep(retry_after)
+                        continue
+                    else:
+                        print(f"  ❌ Rate limit persists for {resource_orn} after {max_retries} retries")
+                        return []
+                elif e.response.status_code == 400:
+                    # Bad request - likely invalid filter or resource doesn't support owners
+                    return []
+                else:
+                    print(f"  ⚠️  Error querying owners for {resource_orn}: {e}")
+                    return []
+
+            except requests.exceptions.Timeout:
+                print(f"  ⚠️  Timeout querying owners for {resource_orn}")
+                if attempt < max_retries - 1:
+                    continue
                 return []
-            print(f"  ⚠️  Error querying owners for {resource_orn}: {e}")
-            return []
-        except Exception as e:
-            print(f"  ⚠️  Error: {e}")
-            return []
+
+            except Exception as e:
+                print(f"  ⚠️  Error: {e}")
+                return []
+
+        return []
 
     def get_all_apps(self) -> List[Dict]:
         """Query all applications from Okta"""
