@@ -17,6 +17,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  workflows: write  # Required to sync workflow files from template
 
 jobs:
   sync-template:
