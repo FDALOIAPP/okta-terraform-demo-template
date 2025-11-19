@@ -490,6 +490,42 @@ Manual trigger → Apply (with secrets)
 - Don't add `environment` to validation workflow
 - Don't skip the dry-run step
 
+### 9. OAuth Authentication Limitation
+
+**OAuth-authenticated service apps cannot create other OAuth applications**, even with proper scopes and admin roles.
+
+```hcl
+# ❌ OAuth service app trying to create OAuth app - WILL FAIL
+provider "okta" {
+  org_name       = var.okta_org_name
+  base_url       = var.okta_base_url
+  client_id      = var.okta_client_id
+  private_key    = var.okta_private_key
+  # ...
+}
+
+resource "okta_app_oauth" "my_app" {
+  # This will fail with "permission denied" error
+}
+```
+
+```hcl
+# ✅ API token works without limitations
+provider "okta" {
+  org_name  = var.okta_org_name
+  base_url  = var.okta_base_url
+  api_token = var.okta_api_token
+}
+
+resource "okta_app_oauth" "my_app" {
+  # This works fine
+}
+```
+
+**Recommendation:** Use API token authentication for simplicity and to avoid permission limitations.
+
+**See:** [`docs/OAUTH_AUTHENTICATION_NOTES.md`](docs/OAUTH_AUTHENTICATION_NOTES.md) for detailed OAuth setup and troubleshooting.
+
 ---
 
 ## Repository Structure Highlights

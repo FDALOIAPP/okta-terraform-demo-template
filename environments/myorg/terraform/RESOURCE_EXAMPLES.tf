@@ -100,6 +100,16 @@
 #   response_types             = ["code"]
 #   token_endpoint_auth_method = "client_secret_post"
 #   consent_method             = "REQUIRED"
+#
+#   # Visibility settings
+#   hide_ios = false
+#   hide_web = false
+#
+#   # IMPORTANT: When apps are visible (hide_ios/hide_web = false),
+#   # login_mode MUST be set to something other than DISABLED
+#   # See CLAUDE.md Gotcha #5 for details
+#   login_mode = "SPEC"
+#   login_uri  = "https://example.com"
 # }
 
 # resource "okta_app_oauth_redirect_uri" "example" {
