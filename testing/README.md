@@ -31,27 +31,15 @@ Comprehensive manual validation plan covering all aspects of the Okta Terraform 
 
 **New in v2.0:** AWS S3 backend validation section with comprehensive state management tests
 
-### [DETAILED_DEMO_BUILD_GUIDE.md](./DETAILED_DEMO_BUILD_GUIDE.md)
-Comprehensive step-by-step tutorial for solutions engineers to build Okta demos using Terraform from scratch.
+### Demo Building
 
-**Includes:**
-- Infrastructure as Code basics
-- Tool installation (Terraform, Git, **AWS CLI**, Python)
-- Understanding the repository structure
-- **AWS Backend setup** (S3 + DynamoDB)
-- Connecting to Okta
-- First Terraform commands
-- Creating resources (users, groups, apps)
-- Making changes and updates
-- Cleanup and troubleshooting
+For building demos, please use the new simplified documentation:
 
-**Estimated Time:** 2-3 hours (first time)
-**Difficulty:** Beginner-friendly (zero experience needed)
-**Target Audience:** Solutions Engineers new to Terraform and Infrastructure as Code
+- **[DEMO_GUIDE.md](../DEMO_GUIDE.md)** - Build demos with templates, AI, or manually (30-60 min)
+- **[LOCAL-USAGE.md](../LOCAL-USAGE.md)** - Learn Terraform basics (15 min)
+- **[TERRAFORM-BASICS.md](../TERRAFORM-BASICS.md)** - Resource reference and examples
 
-**New in v2.0:** AWS backend setup section with detailed GitHub Actions OIDC configuration
-
-> **⚡ Want Quick Demos?** See **[SIMPLE_DEMO_BUILD_GUIDE.md](../SIMPLE_DEMO_BUILD_GUIDE.md)** for AI-assisted demo creation in 30-45 minutes (assumes QUICKSTART completed).
+> **Note:** The previous DETAILED_DEMO_BUILD_GUIDE.md has been archived to [docs/archive/](../docs/archive/).
 
 ---
 
@@ -71,21 +59,20 @@ Use the manual validation plan when:
 
 ### Demo Build Guides
 
-**Two guides available for different needs:**
+**Use the new simplified documentation:**
 
-**[Detailed Demo Build Guide](./DETAILED_DEMO_BUILD_GUIDE.md)** - Use when:
-- Learning Terraform from scratch (zero experience)
-- Onboarding new solutions engineers
-- Understanding Infrastructure as Code deeply
-- Building demo environments step-by-step
-- **Setting up AWS backend for team collaboration**
-- Training team members on GitOps workflows
+**[DEMO_GUIDE.md](../DEMO_GUIDE.md)** - The main demo guide with three approaches:
+- Quick Template (5 min) - Use pre-built demo
+- AI-Assisted (15 min) - Gemini Gem generates custom demos
+- Manual Build (30 min) - Step-by-step for learning
 
-**[Simple Demo Build Guide](../SIMPLE_DEMO_BUILD_GUIDE.md)** - Use when:
-- Creating demos quickly (already completed QUICKSTART)
-- Using AI-assisted code generation
-- Building customer-facing demos rapidly
-- Need demos ready in 30-45 minutes
+**[LOCAL-USAGE.md](../LOCAL-USAGE.md)** - Start here if new to Terraform:
+- Learn basics without GitHub/GitOps complexity
+- 15 minutes to first success
+
+**[TERRAFORM-BASICS.md](../TERRAFORM-BASICS.md)** - Reference:
+- Resource examples (users, groups, apps, OIG)
+- Common patterns and commands
 
 ---
 

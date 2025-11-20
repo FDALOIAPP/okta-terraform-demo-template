@@ -1,5 +1,13 @@
 # Simple Demo Build Guide (Quick Start)
 
+> **⚠️ DEPRECATED:** This guide has been superseded by the new simplified documentation structure.
+>
+> **Please use [DEMO_GUIDE.md](./DEMO_GUIDE.md) instead** - it's shorter, clearer, and integrates with the new learning path.
+>
+> **New to this repository?** Start with [LOCAL-USAGE.md](./LOCAL-USAGE.md) (15 minutes) to learn the basics first.
+
+---
+
 **Build impressive Okta demos in minutes, not hours!**
 
 This guide shows you how to use this template to rapidly create demo environments for customer presentations using AI-assisted methods and pre-built scenarios.

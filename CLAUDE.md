@@ -605,7 +605,7 @@ terraform {
 ### Demo Scenarios
 
 **Common demo patterns documented in:**
-- `testing/DETAILED_DEMO_BUILD_GUIDE.md` - Step-by-step demos
+- `DEMO_GUIDE.md` - Demo building with templates, AI, or manual approaches
 - `ai-assisted/prompts/create_demo_environment.md` - AI prompt template
 - `ai-assisted/examples/example_session_gemini.md` - Real example session
 
@@ -757,7 +757,7 @@ cp testing/MANUAL_VALIDATION_PLAN.md testing/validation_run_$(date +%Y%m%d).md
 - Python script dry-runs
 
 **Demo validation:**
-- Follow `testing/DETAILED_DEMO_BUILD_GUIDE.md`
+- Follow `DEMO_GUIDE.md`
 - Verify OIG features in Okta Admin Console
 - Test approval workflows
 - Validate access reviews
@@ -794,7 +794,7 @@ cp testing/MANUAL_VALIDATION_PLAN.md testing/validation_run_$(date +%Y%m%d).md
    - Customize examples for your use case
 
 5. **Document your patterns**
-   - Update `testing/DETAILED_DEMO_BUILD_GUIDE.md` with your demo scenarios
+   - Update `DEMO_GUIDE.md` with your demo scenarios
    - Create environment-specific READMEs
 
 ---
