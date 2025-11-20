@@ -6,44 +6,48 @@ This index helps you find the right documentation for your needs.
 
 ---
 
-## 🚀 Getting Started
+## Quick Start - Choose Your Path
 
-**New to this template? Start here:**
+**New to this repository?** Start with the simplified guides at the root level:
 
-1. **[README.md](../README.md)** - Overview and features
-2. **[TEMPLATE_SETUP.md](../TEMPLATE_SETUP.md)** - Complete setup guide (secrets, environments, GitHub)
-3. **[OIG_PREREQUISITES.md](../OIG_PREREQUISITES.md)** - Required OIG setup in Okta Admin UI
-4. **[FORKING_GUIDE.md](FORKING_GUIDE.md)** - How to customize for your organization
+| Your Goal | Guide | Time |
+|-----------|-------|------|
+| **Learn Terraform basics** | [LOCAL-USAGE.md](../LOCAL-USAGE.md) | 15 min |
+| **Back up code in GitHub** | [GITHUB-BASIC.md](../GITHUB-BASIC.md) | 20 min |
+| **Full GitOps with CI/CD** | [GITHUB-GITOPS.md](../GITHUB-GITOPS.md) | 45 min |
+| **Build demos** | [DEMO_GUIDE.md](../DEMO_GUIDE.md) | 30-60 min |
+| **Terraform examples** | [TERRAFORM-BASICS.md](../TERRAFORM-BASICS.md) | Reference |
+| **Fix problems** | [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) | Reference |
 
-**Quick References:**
-- **[DIRECTORY_GUIDE.md](../DIRECTORY_GUIDE.md)** - Repository structure explained
-- **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Detailed file organization
+**Recommended learning path:**
+```
+LOCAL-USAGE.md → GITHUB-BASIC.md → GITHUB-GITOPS.md
+   (15 min)        (20 min)          (45 min)
+```
 
 ---
 
-## 📖 Core Documentation
+## Reference Documentation
 
-### Setup & Configuration
+This folder contains advanced reference documentation for specific topics.
 
-| Document | Purpose |
-|----------|---------|
-| [TEMPLATE_SETUP.md](../TEMPLATE_SETUP.md) | First-time setup (GitHub secrets, environments, AWS backend) |
-| [OIG_PREREQUISITES.md](../OIG_PREREQUISITES.md) | Okta Identity Governance prerequisites |
-| [ENVIRONMENT_SETUP_EXAMPLE.md](ENVIRONMENT_SETUP_EXAMPLE.md) | Step-by-step environment creation example |
-| [AWS_BACKEND_SETUP.md](AWS_BACKEND_SETUP.md) | S3 + DynamoDB backend setup |
-| [BACKEND_SETUP_WIZARD.md](BACKEND_SETUP_WIZARD.md) | Interactive backend setup script |
-
-### Workflows & Automation
+### Workflows & Operations
 
 | Document | Purpose |
 |----------|---------|
-| [03-WORKFLOWS-GUIDE.md](03-WORKFLOWS-GUIDE.md) | Complete workflows reference |
-| [WORKFLOWS.md](WORKFLOWS.md) | Workflow descriptions and usage |
-| [GITOPS_WORKFLOW.md](GITOPS_WORKFLOW.md) | GitOps patterns and best practices |
-| [LABEL_WORKFLOW_GUIDE.md](LABEL_WORKFLOW_GUIDE.md) | Label management workflow (2-phase validation) |
-| [LABEL_MANAGEMENT.md](LABEL_MANAGEMENT.md) | Governance labels overview |
+| [03-WORKFLOWS-GUIDE.md](03-WORKFLOWS-GUIDE.md) | Complete GitHub Actions workflow reference |
+| [ROLLBACK_GUIDE.md](ROLLBACK_GUIDE.md) | Disaster recovery procedures |
 
-### API Management
+### Infrastructure
+
+| Document | Purpose |
+|----------|---------|
+| [AWS_BACKEND_SETUP.md](AWS_BACKEND_SETUP.md) | S3/DynamoDB state backend setup |
+| [BACKEND_SETUP_WIZARD.md](BACKEND_SETUP_WIZARD.md) | Choose the right backend for your needs |
+| [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | Repository layout and file organization |
+| [DIRECTORY_GUIDE.md](DIRECTORY_GUIDE.md) | Environment-based directory structure |
+
+### API & Python Scripts
 
 | Document | Purpose |
 |----------|---------|
@@ -51,141 +55,80 @@ This index helps you find the right documentation for your needs.
 | [LABELS_API_VALIDATION.md](LABELS_API_VALIDATION.md) | Labels API investigation and findings |
 | [LESSONS_LEARNED.md](LESSONS_LEARNED.md) | Troubleshooting insights and workarounds |
 
-### Terraform
+### OIG & Governance
 
 | Document | Purpose |
 |----------|---------|
-| [TERRAFORM_RESOURCES.md](TERRAFORM_RESOURCES.md) | Terraform resource reference |
-| [TERRAFORMER.md](TERRAFORMER.md) | Terraformer import tool usage |
-| [TERRAFORMER_OIG_FAQ.md](TERRAFORMER_OIG_FAQ.md) | Terraformer + OIG limitations |
-| [TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md](TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md) | Campaign association errors and fixes |
-| [OIG_MANUAL_IMPORT.md](OIG_MANUAL_IMPORT.md) | Manual OIG import procedures |
+| [../OIG_PREREQUISITES.md](../OIG_PREREQUISITES.md) | OIG setup requirements |
+| [LABEL_MANAGEMENT.md](LABEL_MANAGEMENT.md) | Governance labels technical guide |
+| [LABEL_WORKFLOW_GUIDE.md](LABEL_WORKFLOW_GUIDE.md) | Label management GitOps workflow |
+| [TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md](TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md) | Bundle-specific troubleshooting |
+
+### Import & Migration
+
+| Document | Purpose |
+|----------|---------|
+| [TERRAFORMER.md](TERRAFORMER.md) | Terraformer import tool - complete guide |
 
 ### Okta Terraform Provider Analysis
 
 | Document | Purpose |
 |----------|---------|
-| [PROVIDER_ANALYSIS.md](PROVIDER_ANALYSIS.md) | **Complete provider analysis** - Resources, documentation, gaps (15K words) |
-| [PROVIDER_COVERAGE_MATRIX.md](PROVIDER_COVERAGE_MATRIX.md) | Resource coverage by category - What's available vs missing (8K words) |
-| [../PROVIDER_REVIEW_SUMMARY.md](../PROVIDER_REVIEW_SUMMARY.md) | **Executive summary** of provider review and recommendations |
+| [PROVIDER_REVIEW_SUMMARY.md](PROVIDER_REVIEW_SUMMARY.md) | Executive summary of provider analysis |
+| [PROVIDER_ANALYSIS.md](PROVIDER_ANALYSIS.md) | Complete resource analysis (15K words) |
+| [PROVIDER_COVERAGE_MATRIX.md](PROVIDER_COVERAGE_MATRIX.md) | Resource coverage by category |
 
-**Key Insights:**
-- 103 resources and 47 data sources analyzed
-- 3 CRITICAL missing OIG features (owners, labels, risk rules)
-- Validation workflow recommendations
-- Documentation enhancement opportunities
-
----
-
-## 🤖 AI-Assisted Development
-
-**Location:** `ai-assisted/` directory
+### Integration & Advanced
 
 | Document | Purpose |
 |----------|---------|
-| [ai-assisted/README.md](../ai-assisted/README.md) | Main AI generation guide |
-| [ai-assisted/GEM_SETUP_GUIDE.md](../ai-assisted/GEM_SETUP_GUIDE.md) | Google Gemini setup |
-| [ai-assisted/GEM_QUICK_REFERENCE.md](../ai-assisted/GEM_QUICK_REFERENCE.md) | Gemini quick commands |
-| [ai-assisted/prompts/](../ai-assisted/prompts/) | Ready-to-use prompts |
-| [ai-assisted/examples/](../ai-assisted/examples/) | Example sessions |
+| [DEMO_PLATFORM_INTEGRATION.md](DEMO_PLATFORM_INTEGRATION.md) | Demo Platform webhook integration |
+| [OAUTH_AUTHENTICATION_NOTES.md](OAUTH_AUTHENTICATION_NOTES.md) | OAuth authentication setup |
+| [SCIM_OKTA_AUTOMATION.md](SCIM_OKTA_AUTOMATION.md) | SCIM provisioning guide |
+| [TEMPLATE_SYNC_SETUP.md](TEMPLATE_SYNC_SETUP.md) | Template synchronization |
+| [GITOPS_VALUE.md](GITOPS_VALUE.md) | Business value of GitOps with citations |
 
----
-
-## 🧪 Testing & Validation
-
-**Location:** `testing/` directory
+### Contributing
 
 | Document | Purpose |
 |----------|---------|
-| [testing/README.md](../testing/README.md) | Testing overview |
-| [testing/MANUAL_VALIDATION_PLAN.md](../testing/MANUAL_VALIDATION_PLAN.md) | Complete validation checklist |
-| [testing/DETAILED_DEMO_BUILD_GUIDE.md](../testing/DETAILED_DEMO_BUILD_GUIDE.md) | Step-by-step demo creation |
-
----
-
-## 📋 Reference Materials
-
-### Architecture & Design
-
-| Document | Purpose |
-|----------|---------|
-| [COMPLETE_SOLUTION.md](COMPLETE_SOLUTION.md) | Architecture overview |
-| [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | File and directory layout |
-| [01-GETTING-STARTED.md](01-GETTING-STARTED.md) | Getting started guide |
-
-### Operational Guides
-
-| Document | Purpose |
-|----------|---------|
-| [ROLLBACK_GUIDE.md](ROLLBACK_GUIDE.md) | How to rollback changes |
-| [TESTING.md](TESTING.md) | Testing strategies |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 
 ---
 
-## 🔍 Finding What You Need
+## Find Documentation By Topic
 
 ### "I want to..."
 
 | Task | Start Here |
 |------|-----------|
-| **Set up for the first time** | [TEMPLATE_SETUP.md](../TEMPLATE_SETUP.md) |
-| **Fork for my organization** | [FORKING_GUIDE.md](FORKING_GUIDE.md) |
-| **Import existing Okta config** | [03-WORKFLOWS-GUIDE.md](03-WORKFLOWS-GUIDE.md) → Import All Resources |
-| **Manage governance labels** | [LABEL_WORKFLOW_GUIDE.md](LABEL_WORKFLOW_GUIDE.md) |
-| **Manage resource owners** | [API_MANAGEMENT.md](API_MANAGEMENT.md) → Resource Owners |
-| **Manage risk rules (SOD policies)** | [API_MANAGEMENT.md](API_MANAGEMENT.md) → Risk Rules |
-| **Create a demo environment** | [testing/DETAILED_DEMO_BUILD_GUIDE.md](../testing/DETAILED_DEMO_BUILD_GUIDE.md) |
-| **Use AI to generate code** | [ai-assisted/README.md](../ai-assisted/README.md) |
-| **Troubleshoot issues** | [LESSONS_LEARNED.md](LESSONS_LEARNED.md) |
+| **Get started quickly** | [LOCAL-USAGE.md](../LOCAL-USAGE.md) |
+| **Set up full GitOps** | [GITHUB-GITOPS.md](../GITHUB-GITOPS.md) |
+| **Build a demo** | [DEMO_GUIDE.md](../DEMO_GUIDE.md) |
 | **Set up AWS backend** | [AWS_BACKEND_SETUP.md](AWS_BACKEND_SETUP.md) |
-| **Understand Terraformer** | [TERRAFORMER_OIG_FAQ.md](TERRAFORMER_OIG_FAQ.md) |
-| **Check provider resource coverage** | [PROVIDER_COVERAGE_MATRIX.md](PROVIDER_COVERAGE_MATRIX.md) |
-| **Understand provider limitations** | [PROVIDER_ANALYSIS.md](PROVIDER_ANALYSIS.md) |
+| **Manage governance labels** | [LABEL_WORKFLOW_GUIDE.md](LABEL_WORKFLOW_GUIDE.md) |
+| **Manage resource owners** | [API_MANAGEMENT.md](API_MANAGEMENT.md) |
+| **Import from Okta** | [03-WORKFLOWS-GUIDE.md](03-WORKFLOWS-GUIDE.md) |
+| **Troubleshoot issues** | [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) |
+| **Use AI to generate code** | [ai-assisted/README.md](../ai-assisted/README.md) |
+| **Understand provider coverage** | [PROVIDER_COVERAGE_MATRIX.md](PROVIDER_COVERAGE_MATRIX.md) |
 
 ---
 
-## 📚 Documentation By Topic
-
-### Governance Features
-
-- **Labels:** [LABEL_MANAGEMENT.md](LABEL_MANAGEMENT.md), [LABEL_WORKFLOW_GUIDE.md](LABEL_WORKFLOW_GUIDE.md)
-- **Owners:** [API_MANAGEMENT.md](API_MANAGEMENT.md) → Resource Owners section
-- **Risk Rules:** [API_MANAGEMENT.md](API_MANAGEMENT.md) → Risk Rules section
-
-### Import & Export
-
-- **Complete Import:** [03-WORKFLOWS-GUIDE.md](03-WORKFLOWS-GUIDE.md) → Import All Resources
-- **Terraformer:** [TERRAFORMER.md](TERRAFORMER.md), [TERRAFORMER_OIG_FAQ.md](TERRAFORMER_OIG_FAQ.md)
-- **OIG Manual Import:** [OIG_MANUAL_IMPORT.md](OIG_MANUAL_IMPORT.md)
-
-### Infrastructure
-
-- **AWS Backend:** [AWS_BACKEND_SETUP.md](AWS_BACKEND_SETUP.md)
-- **State Management:** [AWS_BACKEND_SETUP.md](AWS_BACKEND_SETUP.md) → State section
-- **GitHub Actions:** [03-WORKFLOWS-GUIDE.md](03-WORKFLOWS-GUIDE.md)
-
----
-
-## 🆘 Need Help?
-
-1. **Check [LESSONS_LEARNED.md](LESSONS_LEARNED.md)** - Common issues and solutions
-2. **Check [TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md](TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md)** - Bundle-specific issues
-3. **Review [API_MANAGEMENT.md](API_MANAGEMENT.md)** - Comprehensive API operations guide
-4. **Check GitHub Issues** - Search for similar problems
-
----
-
-## 📝 Special Purpose Documents
+## Special Purpose Documents
 
 | Document | Purpose |
 |----------|---------|
-| [CLAUDE.md](../CLAUDE.md) | AI assistant context (for Claude Code) |
-| [CHANGELOG.md](../CHANGELOG.md) | Version history |
-| [SECURITY.md](../SECURITY.md) | Security policy |
+| [../CLAUDE.md](../CLAUDE.md) | AI assistant context (for Claude Code) |
+| [../CHANGELOG.md](../CHANGELOG.md) | Version history |
+| [../SECURITY.md](../SECURITY.md) | Security policy |
 
 ---
 
-**Last Updated:** 2025-11-13
-**Maintained By:** Template maintainers
-**Feedback:** Open an issue if you find broken links or missing documentation
+## Archived Documentation
+
+Older documentation that has been superseded is available in [archive/](archive/).
+
+---
+
+**Last Updated:** 2025-11-20
