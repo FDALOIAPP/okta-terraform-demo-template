@@ -14,15 +14,15 @@ A complete GitOps solution for managing Okta Identity Governance (OIG) using Inf
 |-----------|-------|------|------------|
 | **"I just want to use Terraform locally"** | [LOCAL-USAGE.md](./LOCAL-USAGE.md) | 15 min | Beginner |
 | **"I want to back up my code in GitHub"** | [GITHUB-BASIC.md](./GITHUB-BASIC.md) | 20 min | Beginner |
-| **"I want full CI/CD with team collaboration"** | [QUICKSTART.md](./QUICKSTART.md) | 30-60 min | Intermediate |
+| **"I want full CI/CD with team collaboration"** | [GITHUB-GITOPS.md](./GITHUB-GITOPS.md) | 45 min | Intermediate |
 | **"I need Terraform resource examples"** | [TERRAFORM-BASICS.md](./TERRAFORM-BASICS.md) | Reference | Beginner |
 | **"I'm having an issue"** | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Reference | All levels |
 
 ### Recommended Learning Path
 
 ```
-LOCAL-USAGE.md → GITHUB-BASIC.md → QUICKSTART.md → TEMPLATE_SETUP.md
-   (15 min)        (20 min)          (30 min)         (advanced)
+LOCAL-USAGE.md → GITHUB-BASIC.md → GITHUB-GITOPS.md
+   (15 min)        (20 min)          (45 min)
 ```
 
 **Most users should start with [LOCAL-USAGE.md](./LOCAL-USAGE.md)** - no GitHub, no CI/CD, just Terraform + Okta.
@@ -33,7 +33,7 @@ LOCAL-USAGE.md → GITHUB-BASIC.md → QUICKSTART.md → TEMPLATE_SETUP.md
 
 ### ⚡ Ready for Team Collaboration?
 
-**👉 [QUICKSTART.md](./QUICKSTART.md) - Set up GitHub Actions and team workflows**
+**👉 [GITHUB-GITOPS.md](./GITHUB-GITOPS.md) - Set up GitHub Actions and team workflows**
 
 This guide covers:
 1. Click "Use this template"
@@ -57,11 +57,11 @@ After using this template, run the setup script to configure repository settings
 
 Requires: [GitHub CLI](https://cli.github.com/) with admin access to the repository.
 
-### 📚 Detailed Setup
+### 📚 Advanced Topics
 
-For comprehensive setup with all options:
-- **[TEMPLATE_SETUP.md](./TEMPLATE_SETUP.md)** - Complete setup guide covering AWS backend, multiple environments, and advanced options
-- **[SECRETS_SETUP.md](./SECRETS_SETUP.md)** - Complete guide to configuring GitHub secrets (Okta credentials, AWS access, infrastructure passwords)
+For advanced configurations:
+- **[docs/AWS_BACKEND_SETUP.md](./docs/AWS_BACKEND_SETUP.md)** - S3/DynamoDB state backend for team collaboration
+- **[docs/03-WORKFLOWS-GUIDE.md](./docs/03-WORKFLOWS-GUIDE.md)** - Complete GitHub Actions workflow reference
 
 ### 📖 Documentation
 
@@ -94,7 +94,7 @@ This template provides everything you need to manage Okta with GitOps:
 - ❌ Terraformer cannot import: OIG reviews, catalogs, workflows, etc.
 - ✅ Solution: Use our Python import scripts for OIG resources
 
-See [Terraformer + OIG FAQ](./docs/TERRAFORMER_OIG_FAQ.md) for full details.
+See [Terraformer Guide](./docs/TERRAFORMER.md) for full details.
 
 ## 🏗️ Environment-Based Architecture
 

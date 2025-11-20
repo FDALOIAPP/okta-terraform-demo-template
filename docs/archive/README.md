@@ -19,10 +19,40 @@ In November 2025, the repository documentation was simplified to make it less in
 
 ## Archived Documents
 
-| Document | Original Location | Lines | Replaced By |
-|----------|-------------------|-------|-------------|
-| SIMPLE_DEMO_BUILD_GUIDE.md | Root | 1,641 | [DEMO_GUIDE.md](../../DEMO_GUIDE.md) |
-| DETAILED_DEMO_BUILD_GUIDE.md | testing/ | 1,762 | [LOCAL-USAGE.md](../../LOCAL-USAGE.md), [DEMO_GUIDE.md](../../DEMO_GUIDE.md) |
+### Setup & Getting Started Guides
+
+| Document | Original Location | Replaced By |
+|----------|-------------------|-------------|
+| QUICKSTART.md | Root | [LOCAL-USAGE.md](../../LOCAL-USAGE.md), [GITHUB-BASIC.md](../../GITHUB-BASIC.md) |
+| TEMPLATE_SETUP.md | Root | [GITHUB-GITOPS.md](../../GITHUB-GITOPS.md) |
+| SECRETS_SETUP.md | Root | [GITHUB-GITOPS.md](../../GITHUB-GITOPS.md) |
+| 01-GETTING-STARTED.md | docs/ | [LOCAL-USAGE.md](../../LOCAL-USAGE.md), [GITHUB-BASIC.md](../../GITHUB-BASIC.md) |
+| FORKING_GUIDE.md | docs/ | [GITHUB-GITOPS.md](../../GITHUB-GITOPS.md) |
+| ENVIRONMENT_SETUP_EXAMPLE.md | docs/ | [GITHUB-GITOPS.md](../../GITHUB-GITOPS.md) |
+
+### Workflow & Architecture Guides
+
+| Document | Original Location | Replaced By |
+|----------|-------------------|-------------|
+| WORKFLOWS.md | docs/ | [03-WORKFLOWS-GUIDE.md](../03-WORKFLOWS-GUIDE.md) |
+| GITOPS_WORKFLOW.md | docs/ | [GITHUB-GITOPS.md](../../GITHUB-GITOPS.md) |
+| COMPLETE_SOLUTION.md | docs/ | [docs/PROJECT_STRUCTURE.md](../PROJECT_STRUCTURE.md) |
+
+### Demo Build Guides
+
+| Document | Original Location | Replaced By |
+|----------|-------------------|-------------|
+| SIMPLE_DEMO_BUILD_GUIDE.md | Root | [DEMO_GUIDE.md](../../DEMO_GUIDE.md) |
+| DETAILED_DEMO_BUILD_GUIDE.md | testing/ | [LOCAL-USAGE.md](../../LOCAL-USAGE.md), [DEMO_GUIDE.md](../../DEMO_GUIDE.md) |
+
+### Terraform & Import Guides
+
+| Document | Original Location | Replaced By |
+|----------|-------------------|-------------|
+| TERRAFORM_RESOURCES.md | docs/ | [TERRAFORM-BASICS.md](../../TERRAFORM-BASICS.md) |
+| TERRAFORMER_OIG_FAQ.md | docs/ | [TERRAFORMER.md](../TERRAFORMER.md) |
+| OIG_MANUAL_IMPORT.md | docs/ | [TERRAFORMER.md](../TERRAFORMER.md) |
+| TESTING.md | docs/ | [testing/README.md](../../testing/README.md) |
 
 ---
 
