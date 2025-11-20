@@ -1,5 +1,16 @@
 # Detailed Demo Build Guide (Comprehensive Tutorial)
 
+> **⚠️ DEPRECATED:** This guide has been superseded by the new simplified documentation structure.
+>
+> **Please use these shorter, focused guides instead:**
+> - **[LOCAL-USAGE.md](../LOCAL-USAGE.md)** (15 min) - Learn Terraform basics
+> - **[DEMO_GUIDE.md](../DEMO_GUIDE.md)** (30-60 min) - Build demos with multiple approaches
+> - **[TERRAFORM-BASICS.md](../TERRAFORM-BASICS.md)** - Resource reference
+>
+> The new guides are shorter, clearer, and integrate with the Gemini Gem for AI assistance.
+
+---
+
 **Welcome!** This guide will walk you through building a complete Okta infrastructure demo using Terraform - even if you've never heard of these tools before.
 
 **⏱️ Time Required:** 2-3 hours (first time)

@@ -4,17 +4,42 @@
 
 A complete GitOps solution for managing Okta Identity Governance (OIG) using Infrastructure as Code with Terraform, GitHub Actions, and Python automation.
 
-## 🚀 Quick Start
+---
 
-### ⚡ First Time Here? Start Here!
+## 🧭 Choose Your Path
 
-**👉 [QUICKSTART.md](./QUICKSTART.md) - Get your first success in 10 minutes!**
+**New to this repository? Pick the guide that matches your goal:**
 
-No prior knowledge needed - just follow the step-by-step guide to:
+| Your Goal | Guide | Time | Complexity |
+|-----------|-------|------|------------|
+| **"I just want to use Terraform locally"** | [LOCAL-USAGE.md](./LOCAL-USAGE.md) | 15 min | Beginner |
+| **"I want to back up my code in GitHub"** | [GITHUB-BASIC.md](./GITHUB-BASIC.md) | 20 min | Beginner |
+| **"I want full CI/CD with team collaboration"** | [QUICKSTART.md](./QUICKSTART.md) | 30-60 min | Intermediate |
+| **"I need Terraform resource examples"** | [TERRAFORM-BASICS.md](./TERRAFORM-BASICS.md) | Reference | Beginner |
+| **"I'm having an issue"** | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Reference | All levels |
+
+### Recommended Learning Path
+
+```
+LOCAL-USAGE.md → GITHUB-BASIC.md → QUICKSTART.md → TEMPLATE_SETUP.md
+   (15 min)        (20 min)          (30 min)         (advanced)
+```
+
+**Most users should start with [LOCAL-USAGE.md](./LOCAL-USAGE.md)** - no GitHub, no CI/CD, just Terraform + Okta.
+
+---
+
+## 🚀 Full GitOps Setup
+
+### ⚡ Ready for Team Collaboration?
+
+**👉 [QUICKSTART.md](./QUICKSTART.md) - Set up GitHub Actions and team workflows**
+
+This guide covers:
 1. Click "Use this template"
-2. Add your Okta credentials
+2. Add your Okta credentials as GitHub secrets
 3. Import your Okta org into code
-4. See the results!
+4. Automated validation on pull requests
 
 ### 🤖 Automated Setup Script
 
@@ -569,8 +594,8 @@ Comprehensive guides are available in the `docs/` directory:
 - **[docs/TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md](./docs/TROUBLESHOOTING_ENTITLEMENT_BUNDLES.md)** - Bundle-specific issues
 
 ### Demo Building
-- **[SIMPLE_DEMO_BUILD_GUIDE.md](./SIMPLE_DEMO_BUILD_GUIDE.md)** - Quick demo creation (30-45 min, AI-assisted)
-- **[testing/DETAILED_DEMO_BUILD_GUIDE.md](./testing/DETAILED_DEMO_BUILD_GUIDE.md)** - Comprehensive tutorial (2-3 hours, learn from scratch)
+- **[DEMO_GUIDE.md](./DEMO_GUIDE.md)** - Build demos with templates, AI, or manually (30-60 min)
+- **[TERRAFORM-BASICS.md](./TERRAFORM-BASICS.md)** - Terraform resource reference and examples
 
 ### AI-Assisted Development
 - **[ai-assisted/README.md](./ai-assisted/README.md)** - AI code generation guide

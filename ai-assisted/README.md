@@ -1,14 +1,32 @@
 # AI-Assisted Terraform Generation
 
-This directory contains tools and templates for using AI assistants (Gemini, ChatGPT, Claude) to generate Terraform code for Okta infrastructure.
+This directory contains tools and templates for using AI assistants (Gemini, ChatGPT, Claude) to generate Terraform code for Okta infrastructure AND guide you through the learning process.
 
-## 🚀 Before You Use AI: Try the Ready-Made Templates!
+## 🧭 New Here? Start with the Right Guide
 
-**Want something even faster?** We provide ready-to-use templates that don't require AI:
+**The Gemini Gem can help you navigate the repository and learn!** Just ask:
+- "Where should I start?"
+- "I'm new to Terraform"
+- "Help me build my first demo"
 
-### **QUICKSTART_DEMO.tf.example** - Deploy in 2 Minutes ⭐
+Or use these guides directly:
 
-Perfect for testing or learning:
+| Your Goal | Guide | Time |
+|-----------|-------|------|
+| Use Terraform locally | [LOCAL-USAGE.md](../LOCAL-USAGE.md) | 15 min |
+| Back up code in GitHub | [GITHUB-BASIC.md](../GITHUB-BASIC.md) | 20 min |
+| Full team GitOps | [GITHUB-GITOPS.md](../GITHUB-GITOPS.md) | 45 min |
+| Build a demo | [DEMO_GUIDE.md](../DEMO_GUIDE.md) | 30-60 min |
+| Terraform examples | [TERRAFORM-BASICS.md](../TERRAFORM-BASICS.md) | Reference |
+
+---
+
+## 🚀 Quick Demo Options
+
+### Option 1: Quick Template (2 minutes)
+
+No AI required - use our pre-built demo:
+
 ```bash
 cd ../environments/myorg/terraform
 cp QUICKSTART_DEMO.tf.example demo.tf
@@ -16,36 +34,47 @@ cp QUICKSTART_DEMO.tf.example demo.tf
 terraform init && terraform apply
 ```
 
-**Creates:** 5 users, 3 groups, 1 OAuth app - no AI needed!
+**Creates:** 5 users, 3 groups, 1 OAuth app
 
-### **RESOURCE_EXAMPLES.tf** - Comprehensive Reference
+### Option 2: AI-Generated Demo (5 minutes)
 
-Browse copy-paste examples for ANY Okta resource:
+Tell the Gemini Gem what you need:
+```
+Create a healthcare demo with 5 doctors, 3 nurses,
+an Epic EHR app, and patient portal
+```
+
+The Gem generates complete Terraform code instantly.
+
+### Option 3: Browse Examples
+
 ```bash
 less ../environments/myorg/terraform/RESOURCE_EXAMPLES.tf
 ```
 
-**Contains:** Users, Groups, Apps, Policies, OIG, Hooks - all resource types!
-
-**See:** [../environments/myorg/terraform/README.md](../environments/myorg/terraform/README.md) for complete template guide.
+**Contains:** Users, Groups, Apps, Policies, OIG - all resource types!
 
 ---
 
-## When to Use AI vs Templates
+## When to Use AI vs Other Options
 
-**Use Templates When:**
-- ✅ Testing this template for the first time
-- ✅ You want a quick working demo (2 minutes)
-- ✅ You need examples of specific resource types
-- ✅ You're learning Terraform basics
+**Use Gemini Gem When:**
+- ✅ You need guidance on where to start
+- ✅ You want custom demo scenarios
+- ✅ You need complex configurations quickly
+- ✅ You want explanations with your code
 
-**Use AI When:**
-- ✅ You need custom, specific scenarios
-- ✅ Templates don't have exactly what you need
-- ✅ You want to generate complex configurations quickly
-- ✅ You're comfortable with Terraform and want automation
+**Use Templates/Examples When:**
+- ✅ Testing for the first time (Quick Template)
+- ✅ You know exactly what resource you need
+- ✅ You prefer copy-paste over generation
 
-**Recommendation:** Start with templates, graduate to AI for custom needs!
+**Use the Guides When:**
+- ✅ You're learning Terraform basics (LOCAL-USAGE.md)
+- ✅ You need step-by-step instructions
+- ✅ You're setting up GitOps workflows
+
+**Recommendation:** Start with LOCAL-USAGE.md to learn basics, then use the Gem for custom demos!
 
 ---
 
