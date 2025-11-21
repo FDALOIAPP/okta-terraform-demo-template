@@ -191,9 +191,11 @@ jobs:
           SECRETS+=$(grep -r -i 'api_token\s*=\s*"' . --include="*.tf" || true)
           SECRETS+=$(grep -r -i 'secret\s*=\s*"' . --include="*.tf" || true)
 
-          # Exclude variable definitions and var. references
+          # Exclude variable definitions, var. references, and commented examples
           SECRETS=$(echo "$SECRETS" | grep -v 'variable "' || true)
           SECRETS=$(echo "$SECRETS" | grep -v 'var\.' || true)
+          SECRETS=$(echo "$SECRETS" | grep -v '^\s*#' || true)
+          SECRETS=$(echo "$SECRETS" | grep -v ':#\s*' || true)
 
           if [ -n "$SECRETS" ]; then
             echo "❌ Potential hardcoded secrets found:" >> $GITHUB_STEP_SUMMARY
