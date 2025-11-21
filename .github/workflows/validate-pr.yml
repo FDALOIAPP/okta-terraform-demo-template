@@ -129,9 +129,17 @@ jobs:
           echo "Scanning for potential secrets..."
 
           # Check for common secret patterns
-          # Exclude generate-oauth-keys.yml which legitimately references key generation terms
+          # Exclude files that legitimately reference private keys:
+          # - generate-oauth-keys.yml: OAuth key generation workflow
+          # - deploy-oag-app.yml: OAG deployment workflow
+          # - manage_oag_apps.py: OAG management script
+          # - oag_client.py: OAG API client (uses JWT auth)
           if grep -r -i "PRIVATE[_-]KEY" --include="*.tf" --include="*.py" --include="*.yml" \
-             --exclude="generate-oauth-keys.yml" . 2>/dev/null; then
+             --exclude="generate-oauth-keys.yml" \
+             --exclude="deploy-oag-app.yml" \
+             --exclude="manage_oag_apps.py" \
+             --exclude="oag_client.py" \
+             . 2>/dev/null; then
             echo "❌ Error: Found potential private key"
             exit 1
           fi

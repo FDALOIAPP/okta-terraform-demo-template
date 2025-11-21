@@ -114,8 +114,9 @@ jobs:
           echo "## Template String Validation" >> $GITHUB_STEP_SUMMARY
 
           # Check for unescaped ${source.* or ${user.* patterns
-          UNESCAPED=$(grep -r '\${source\.' . --include="*.tf" || true)
-          UNESCAPED+=$(grep -r '\${user\.' . --include="*.tf" || true)
+          # Exclude properly escaped $${...} patterns by filtering out lines with $$
+          UNESCAPED=$(grep -r '\${source\.' . --include="*.tf" 2>/dev/null | grep -v '\$\${' || true)
+          UNESCAPED+=$(grep -r '\${user\.' . --include="*.tf" 2>/dev/null | grep -v '\$\${' || true)
 
           if [ -n "$UNESCAPED" ]; then
             echo "❌ Found unescaped Okta template strings:" >> $GITHUB_STEP_SUMMARY
@@ -190,9 +191,11 @@ jobs:
           SECRETS+=$(grep -r -i 'api_token\s*=\s*"' . --include="*.tf" || true)
           SECRETS+=$(grep -r -i 'secret\s*=\s*"' . --include="*.tf" || true)
 
-          # Exclude variable definitions and var. references
+          # Exclude variable definitions, var. references, and commented examples
           SECRETS=$(echo "$SECRETS" | grep -v 'variable "' || true)
           SECRETS=$(echo "$SECRETS" | grep -v 'var\.' || true)
+          SECRETS=$(echo "$SECRETS" | grep -v '^\s*#' || true)
+          SECRETS=$(echo "$SECRETS" | grep -v ':#\s*' || true)
 
           if [ -n "$SECRETS" ]; then
             echo "❌ Potential hardcoded secrets found:" >> $GITHUB_STEP_SUMMARY

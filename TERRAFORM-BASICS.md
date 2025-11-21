@@ -190,6 +190,39 @@ resource "okta_entitlement_bundle" "admin_access" {
 }
 ```
 
+**Dynamic Value Lookups:** When bundling entitlement values, use dynamic blocks to reference Okta-generated IDs by external_value:
+
+```hcl
+locals {
+  admin_accounts = ["ACC001", "ACC002", "ACC003"]
+}
+
+resource "okta_entitlement_bundle" "admin_bundle" {
+  name   = "Admin Bundle"
+  status = "ACTIVE"
+
+  target {
+    external_id = okta_app_oauth.my_app.id
+    type        = "APPLICATION"
+  }
+
+  entitlements {
+    id = okta_entitlement.accounts.id
+    dynamic "values" {
+      for_each = [
+        for v in okta_entitlement.accounts.values : v.id
+        if contains(local.admin_accounts, v.external_value)
+      ]
+      content {
+        id = values.value
+      }
+    }
+  }
+}
+```
+
+**Note:** `values` is a block type, not an argument. See `RESOURCE_EXAMPLES.tf` for complete examples.
+
 ### Access Review Campaign
 
 ```hcl
