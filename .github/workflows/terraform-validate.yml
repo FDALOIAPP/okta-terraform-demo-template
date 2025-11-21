@@ -114,8 +114,9 @@ jobs:
           echo "## Template String Validation" >> $GITHUB_STEP_SUMMARY
 
           # Check for unescaped ${source.* or ${user.* patterns
-          UNESCAPED=$(grep -r '\${source\.' . --include="*.tf" || true)
-          UNESCAPED+=$(grep -r '\${user\.' . --include="*.tf" || true)
+          # Exclude properly escaped $${...} patterns by filtering out lines with $$
+          UNESCAPED=$(grep -r '\${source\.' . --include="*.tf" 2>/dev/null | grep -v '\$\${' || true)
+          UNESCAPED+=$(grep -r '\${user\.' . --include="*.tf" 2>/dev/null | grep -v '\$\${' || true)
 
           if [ -n "$UNESCAPED" ]; then
             echo "❌ Found unescaped Okta template strings:" >> $GITHUB_STEP_SUMMARY
