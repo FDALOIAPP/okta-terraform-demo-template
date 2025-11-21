@@ -526,6 +526,68 @@ resource "okta_app_oauth" "my_app" {
 
 **See:** [`docs/OAUTH_AUTHENTICATION_NOTES.md`](docs/OAUTH_AUTHENTICATION_NOTES.md) for detailed OAuth setup and troubleshooting.
 
+### 10. Dynamic Value Lookups for Entitlement Bundles
+
+**Entitlement bundles require Okta-generated value IDs, not external_value strings.**
+
+When creating entitlement bundles, you need to reference the Okta-generated `id` for each entitlement value, not the `external_value` string you defined. Use `dynamic` blocks with `for` expressions to look up value IDs:
+
+```hcl
+# Define account groupings in locals for reusability
+locals {
+  standard_accounts = ["DEMO38", "26DEMO26", "26DEMO14", "DEMO42"]
+}
+
+# Create entitlement with values
+resource "okta_entitlement" "app_accounts" {
+  app_id         = okta_app_oauth.my_app.id
+  key            = "accounts"
+  type           = "array<string>"
+  display_name   = "Account Access"
+
+  values {
+    value          = "ANCHOR CHECKING II"
+    external_value = "DEMO38"
+  }
+  values {
+    value          = "CASH MANAGEMENT III"
+    external_value = "26DEMO26"
+  }
+  # ... more values
+}
+
+# Bundle using dynamic lookup
+resource "okta_entitlement_bundle" "standard_access" {
+  name        = "Standard Access"
+  description = "Standard 4-account access"
+  status      = "ACTIVE"
+
+  target {
+    external_id = okta_app_oauth.my_app.id
+    type        = "APPLICATION"
+  }
+
+  entitlements {
+    id = okta_entitlement.app_accounts.id
+    dynamic "values" {
+      for_each = [
+        for v in okta_entitlement.app_accounts.values : v.id
+        if contains(local.standard_accounts, v.external_value)
+      ]
+      content {
+        id = values.value
+      }
+    }
+  }
+}
+```
+
+**Key points:**
+- `values` is a **block type**, not an argument - use `dynamic "values"` not `values = [...]`
+- The `for` expression filters values by `external_value` and returns the Okta-generated `id`
+- This creates proper resource dependencies so bundles can be created in the same apply as entitlements
+- Use locals to define reusable account groupings (standard, limited, full, etc.)
+
 ---
 
 ## Repository Structure Highlights

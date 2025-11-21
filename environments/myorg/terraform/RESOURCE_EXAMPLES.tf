@@ -663,31 +663,72 @@
 # Entitlement Bundles
 # -----------------------------------------------------------------------------
 
-# resource "okta_entitlement_bundle" "example" {
-#   # Entitlement bundles define collections of access rights
-#   # Documentation: https://registry.terraform.io/providers/okta/okta/latest/docs/resources/entitlement_bundle
+# Entitlement bundles define collections of access rights
+# Documentation: https://registry.terraform.io/providers/okta/okta/latest/docs/resources/entitlement_bundle
 #
-#   name                = "Sales Team Access"
-#   description         = "Standard access for sales team members"
-#   target_resource_orn = "orn:okta:idp:org:apps:oauth2:0oa..."
-#   status              = "ACTIVE"
+# IMPORTANT: Bundles require Okta-generated value IDs, not external_value strings.
+# Use dynamic blocks with for expressions to look up IDs by external_value.
+
+# Example: Define account groupings in locals for reusability
+# locals {
+#   standard_accounts = ["DEMO38", "26DEMO26", "26DEMO14", "DEMO42"]
+#   limited_accounts  = ["DEMO38", "DEMO42"]
+#   all_accounts      = ["DEMO38", "26DEMO26", "26DEMO14", "DEMO2", "149259"]
+# }
+
+# Example: Basic bundle (hardcoded IDs - not recommended)
+# resource "okta_entitlement_bundle" "basic_example" {
+#   name        = "Sales Team Access"
+#   description = "Standard access for sales team members"
+#   status      = "ACTIVE"
 #
 #   target {
-#     external_id = "0oa..."  # App or resource ID
+#     external_id = okta_app_oauth.my_app.id
 #     type        = "APPLICATION"
 #   }
 #
 #   entitlements {
-#     id = "ent..."
+#     id = okta_entitlement.my_entitlement.id
 #     values {
-#       id = "val..."
+#       id = "val..."  # Hardcoded Okta-generated ID
+#     }
+#   }
+# }
+
+# Example: Bundle with dynamic value lookups (RECOMMENDED)
+# resource "okta_entitlement_bundle" "dynamic_example" {
+#   name        = "Standard Access Bundle"
+#   description = "Standard 4-account access"
+#   status      = "ACTIVE"
+#
+#   target {
+#     external_id = okta_app_oauth.my_app.id
+#     type        = "APPLICATION"
+#   }
+#
+#   entitlements {
+#     id = okta_entitlement.app_accounts.id
+#     dynamic "values" {
+#       for_each = [
+#         for v in okta_entitlement.app_accounts.values : v.id
+#         if contains(local.standard_accounts, v.external_value)
+#       ]
+#       content {
+#         id = values.value
+#       }
 #     }
 #   }
 #
-#   # Note: This resource manages the BUNDLE DEFINITION only
-#   # Principal assignments (which users/groups have this bundle) should be
-#   # managed via Okta Admin UI or direct API calls, not in Terraform
+#   # This approach:
+#   # - Uses dynamic blocks (values is a block type, not an argument)
+#   # - Filters values by external_value string
+#   # - Returns the Okta-generated value ID
+#   # - Creates proper resource dependencies for same-apply creation
 # }
+
+# Note: This resource manages the BUNDLE DEFINITION only
+# Principal assignments (which users/groups have this bundle) should be
+# managed via Okta Admin UI or direct API calls, not in Terraform
 
 # -----------------------------------------------------------------------------
 # Principal Entitlements (Assignments)
